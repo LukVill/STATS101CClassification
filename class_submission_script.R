@@ -54,7 +54,7 @@ data_split <- initial_split(train, prop = .1, strata = action_taken)
 train_sample <- training(data_split)
 
 # Creating Model
-boost_tree_model <- boost_tree(learn_rate = 0.0010) %>%
+boost_tree_model <- boost_tree(learn_rate = 0.0009) %>%
   set_engine("xgboost") %>%
   set_mode("classification")
 
@@ -114,7 +114,7 @@ final_model_fit <- wf_bt %>% fit(data = train)
 preds <- final_model_fit %>% predict(new_data = test)
 
 # Reading in test data again to reinclude original ID's
-test <- read.csv(testFilepath)
+test <- read.csv("test2.csv")
 
 # Prediction Results
 test_preds <- test %>%
