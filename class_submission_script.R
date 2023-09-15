@@ -24,7 +24,8 @@ train <- train %>%
 # make the output a factor
 train$action_taken <- as.factor(train$action_taken) 
 
-# group numeric cols together in the beginning (income, loan_amount, property_value, combined_loan_to_value_ratio)
+# group numeric cols together in the beginning (income, loan_amount, property_value,
+# combined_loan_to_value_ratio)
 train <- train %>%
   relocate(income, .before = loan_type) %>%
   relocate(loan_amount, .before = loan_type) %>%
@@ -36,7 +37,8 @@ train <- train %>%
 test <- test %>% 
   dplyr::select(-colsToRemove)
 
-# Group numeric cols together in the beginning (income, loan_amount, property_value, combined_loan_to_value_ratio)
+# Group numeric cols together in the beginning (income, loan_amount, property_value,
+# combined_loan_to_value_ratio)
 test <- test %>% 
   relocate(income, .before = loan_type) %>% 
   relocate(loan_amount, .before = loan_type) %>% 
@@ -65,8 +67,10 @@ rec <- rec %>%
   step_mutate_at(starts_with("race_of"), fn = function(x) if_else(is.na(x), 7, x)) %>%
   step_mutate_at(starts_with("automated_underwriting_system"), fn = function(x) if_else(is.na(x), 6, x)) %>%
   # change numeric cols into double for imputation
-  step_mutate_at(loan_amount, income, combined_loan_to_value_ratio, property_value, fn = function(x) as.double(x)) %>%
-  # imputation of numeric variables, rolling works better because linear reg cannot work with NA's, and KNN takes forever
+  step_mutate_at(loan_amount, income, combined_loan_to_value_ratio, property_value,
+                 fn = function(x) as.double(x)) %>%
+  # imputation of numeric variables, rolling works better because linear reg cannot
+  # work with NA's, and KNN takes forever
   step_impute_roll(income, combined_loan_to_value_ratio, property_value, window = 13) %>%
   # fix state NA's
   step_mutate_at(state, fn = function(x) if_else(is.na(x), "NA", x)) %>%
@@ -76,12 +80,14 @@ rec <- rec %>%
   step_mutate_at(age_of_co_applicant_62, fn = function(x) if_else(is.na(x), "NA", x)) %>%
   # filter out numeric variables that still have NA's
   step_filter(!is.na(income) & !is.na(combined_loan_to_value_ratio) & !is.na(property_value)) %>%
-  # since income can be negative, it cannot log transform correctly, so must shift by minimum of income so lowest would be value of 1
+  # since income can be negative, it cannot log transform correctly,
+  # so must shift by minimum of income so lowest would be value of 1
   step_mutate_at(income, fn = function(x) x <- abs(min(x)) + x + 1) %>%
   # transformation of numeric variables
   step_log(loan_amount, income, combined_loan_to_value_ratio, property_value) %>% 
   # change all nominal variables into characters
-  step_mutate_at(all_predictors(), -loan_amount, -income, -combined_loan_to_value_ratio, -property_value, fn = function(x) as.factor(x)) %>% 
+  step_mutate_at(all_predictors(), -loan_amount, -income, -combined_loan_to_value_ratio,
+                 -property_value, fn = function(x) as.factor(x)) %>% 
   # normalize all numeric predictors
   step_normalize(all_numeric_predictors()) %>%
   # remove zero variance variables
@@ -114,6 +120,8 @@ test_preds <- test %>%
   bind_cols(preds) %>%
   rename(action_taken = .pred_class)
 
-head(test_preds)
+# CSV of results
+write_csv(test_preds, "boostedpred1.csv")
+
 
 
