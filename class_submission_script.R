@@ -1,15 +1,17 @@
+#Note: The submission for this script is for the results of boostedpred1.csv on
+#the competition results. That was the submission that was selected for in the 
+#competition, but another model was autoselected by kaggle, but those results 
+#were not reproducible, so boostedtree1.csv was our choice for competition submission. 
+
+
 library(tidyverse)
 library(tidymodels)
 library(stringr)
 library(yardstick)
 library(xgboost)
 
-# SET THE WD TO YOUR FOLDER
-trainFilepath <- paste0(getwd(),"/train2.csv")
-testFilepath <- paste0(getwd(),"/test2.csv")
-
-train <- read.csv(trainFilepath)
-test <- read.csv(testFilepath)
+train <- read.csv("train2.csv")
+test <- read.csv("test2.csv")
 
 colsToRemove <- c("id","activity_year", "legal_entity_identifier_lei",
                   "total_points_and_fees", "introductory_rate_period",
