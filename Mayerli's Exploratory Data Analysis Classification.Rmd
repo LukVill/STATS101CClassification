@@ -1,0 +1,91 @@
+```{r}
+#load data
+training.set <- read_csv("train2.csv")
+testing.set <- read_csv("test2.csv")
+head(training.set)
+```
+
+*Exploratory Data Analysis (EDA)*
+
+```{r}
+result <- training.set %>%
+  group_by(state) %>%
+  summarise(loan_accept_rate = sum(action_taken == 1)/ sum(action_taken)
+  )
+# Filter data to keep only acceptance rates above 0.4
+acceptance_rates_abv <- result %>%
+  filter(loan_accept_rate > 0.3)
+# Create a bar chart
+ggplot(acceptance_rates_abv, aes(x = state, y = loan_accept_rate)) +
+  geom_bar(stat = "identity", fill = "blue") +
+  labs(title = "Loan Acceptance Rate by State above 30%", x = "State", y = "Acceptance Rate")+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),plot.title = element_text(hjust = 0.5))
+```
+
+```{r}
+# Numeric columns to create scatter plots for
+numeric_columns <- c("property_value", "loan_term", 
+                     "combined_loan_to_value_ratio", "income", "loan_amount")
+
+# Create a new dataframe containing only the selected columns
+num_vars <- training.set[numeric_columns]
+pairs(num_vars)
+```
+
+```{r}
+
+results_by_sex<- training.set %>%
+  group_by(gender = as.factor(sex_of_applicant_or_borrower)) %>%
+  summarise(loan_accept_rate = sum(action_taken == 1)/ sum(action_taken)
+  )
+
+#remove irrelevant cases of gender, i.e., not applicable
+results_by_sex <- subset(results_by_sex, !(gender %in% c(3, 4)))
+results_by_sex$sex <- c("male","female","non-binary")
+# Create a bar chart
+ggplot(results_by_sex, aes(x = sex, y = loan_accept_rate)) +
+  geom_bar(stat = "identity", fill = "blue") +
+  labs(title = "Loan Acceptance Rate by Sex of Applicant ", x = "Sex", y = "Acceptance Rate")+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),plot.title = element_text(hjust = 0.5))
+```
+
+```{r warning=FALSE}
+subset_data <- training.set[, numeric_columns]
+# Create a box plot for property_value
+bplt1 <- ggplot(subset_data, aes(y = property_value)) +
+  geom_boxplot() +
+  labs(
+    title = "Box Plot of Property Value",
+    y = "Property Value"
+  )
+# Create a box plot for loan term
+bplt2 <-ggplot(subset_data, aes(y = loan_term)) +
+  geom_boxplot() +
+  labs(
+    title = "Box Plot of Loan Term ",
+    y = "Property Value"
+  )
+# Create a box plot for property_value
+bplt3 <-ggplot(subset_data, aes(y = combined_loan_to_value_ratio)) +
+  geom_boxplot() +
+  labs(
+    title = "Box Plot of Combined Loan to Value Ratio",
+    y = "Property Value"
+  )
+
+bplt4 <-ggplot(subset_data, aes(y = income)) +
+  geom_boxplot() +
+  labs(
+    title = "Box Plot of Income",
+    y = "Property Value"
+  )
+# Arrange the plots in a 2x2 grid
+grid.arrange(bplt1, bplt2, bplt3, bplt4, ncol = 2)
+```
+
+```{r}
+library(purrr)
+subset_data$action_taken <- training.set$action_taken
+subset_data %>% split(.$action_taken) %>%
+  map(summary)
+```
