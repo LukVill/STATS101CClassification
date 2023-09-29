@@ -1,6 +1,8 @@
 # STATS101CClassification
 UCLA Summer '23 STATS101C Classification Team Project
 
+![](readmebanner.png)
+
 __Abstract__
 
 Loan applications come from a diverse range of applicants, each generally comprising unique
